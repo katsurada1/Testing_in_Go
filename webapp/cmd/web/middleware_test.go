@@ -1,17 +1,19 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
 func Test_application_addIPToContext(t *testing.T) {
-	tests := []struct{
-		headerName string
+	tests := []struct {
+		headerName  string
 		headerValue string
-		addr string
-		emptyAddr bool
+		addr        string
+		emptyAddr   bool
 	}{
 		{"", "", "", false},
 		{"", "", "", true},
@@ -22,7 +24,7 @@ func Test_application_addIPToContext(t *testing.T) {
 	var app application
 
 	// create a dummy handler that we'll use to check the context
-	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// make sure that the value exists in the context
 		val := r.Context().Value(contextUserKey)
 		if val == nil {
@@ -56,5 +58,24 @@ func Test_application_addIPToContext(t *testing.T) {
 		}
 
 		handlerToTest.ServeHTTP(httptest.NewRecorder(), req)
+	}
+}
+
+func Test_application_ipFromContext(t *testing.T) {
+	// create an app var of type application
+	var app application
+
+	// get a context
+	ctx := context.Background()
+
+	// put something in the context
+	ctx = context.WithValue(ctx, contextUserKey, "whatever")
+
+	// call the function
+	ip := app.ipFromContext(ctx)
+
+	// perform the test
+	if !strings.EqualFold("whatever", ip) {
+		t.Error("wrong value returned from context")
 	}
 }
