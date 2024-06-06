@@ -6,18 +6,16 @@ import (
 	"testing"
 )
 
-
 func Test_application_handlers(t *testing.T) {
 	var theTests = []struct {
-		name string
-		url string
+		name               string
+		url                string
 		expectedStatusCode int
-	} {
+	}{
 		{"home", "/", http.StatusOK},
 		{"404", "/fish", http.StatusNotFound},
 	}
 
-	var app application
 	routes := app.routes()
 
 	// create a test server
